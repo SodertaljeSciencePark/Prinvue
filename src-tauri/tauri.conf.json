@@ -23,13 +23,39 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": [
+      "deb",
+      "rpm",
+      "appimage",
+      "msi",
+      "exe",
+      "nsis",
+      "dmg",
+      "app"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "deb": {
+      "depends": [
+        "webkit2gtk-4.1"
+      ]
+    },
+    "rpm": {
+      "license": "MIT"
+    },
+    "nsis": {
+      "installerIcon": "icons/icon.ico",
+      "headerImage": "icons/installer-header.bmp",
+      "dialogImage": "icons/installer-dialog.bmp"
+    },
+    "dmg": {
+      "background": "icons/dmg-background.tiff",
+      "format": "Zstandard"
+    }
   }
 }
