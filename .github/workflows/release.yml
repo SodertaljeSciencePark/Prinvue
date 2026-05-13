@@ -1,0 +1,182 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - release
+
+# Ensure only one release workflow runs at a time per branch
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 1: Standard platforms (macOS, Windows, Linux x86_64)
+  # Uses tauri-action which automatically creates the GitHub Release/draft.
+  # ─────────────────────────────────────────────────────────────────────────────
+  release-standard:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target aarch64-apple-darwin"
+            label: "macOS Apple Silicon"
+          - platform: macos-latest
+            args: "--target x86_64-apple-darwin"
+            label: "macOS Intel"
+          - platform: ubuntu-22.04
+            args: ""
+            label: "Linux x86_64"
+          - platform: windows-latest
+            args: ""
+            label: "Windows"
+
+    name: Build ${{ matrix.label }}
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: "yarn"
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: yarn install
+
+      - name: Build & publish via tauri-action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: "v__VERSION__"
+          releaseName: "v__VERSION__"
+          releaseBody: "See the assets below to download and install this release."
+          releaseDraft: true     # stays a draft until you manually publish
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 2: Linux ARM (aarch64 + armv7l) via QEMU emulation
+  # Runs after release-standard so the GitHub Release already exists.
+  # ─────────────────────────────────────────────────────────────────────────────
+  release-linux-arm:
+    needs: release-standard
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            cpu: cortex-a72
+            base_image: https://dietpi.com/downloads/images/DietPi_RPi5-ARMv8-Bookworm.img.xz
+            deb_arch: arm64
+            rpm_arch: aarch64
+            appimage_arch: aarch64
+            label: "Linux ARM64"
+          - arch: armv7l
+            cpu: cortex-a53
+            base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv7-Bookworm.img.xz
+            deb_arch: armhfp
+            rpm_arch: arm
+            appimage_arch: armhf
+            label: "Linux ARMv7"
+
+    name: Build ${{ matrix.label }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          cache-on-failure: true
+
+      - name: Build app (ARM)
+        uses: pguyot/arm-runner-action@v2.6.5
+        with:
+          base_image: ${{ matrix.base_image }}
+          cpu: ${{ matrix.cpu }}
+          bind_mount_repository: true
+          image_additional_mb: 10240
+          optimize_image: no
+          commands: |
+            export HOME=/root
+            export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
+
+            apt-get update -y --allow-releaseinfo-change
+            apt-get autoremove -y
+            apt-get install -y --no-install-recommends --no-install-suggests \
+              curl libwebkit2gtk-4.1-dev build-essential libssl-dev \
+              libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev \
+              patchelf libfuse2 file
+
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            . "$HOME/.cargo/env"
+
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | bash
+            apt-get install -y nodejs
+            npm install -g yarn
+
+            yarn install
+            yarn tauri build --verbose
+
+      - name: Get app version
+        run: echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
+
+      - name: Upload .deb to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ env.APP_VERSION }}"
+          file: src-tauri/target/release/bundle/deb/appname_${{ env.APP_VERSION }}_${{ matrix.deb_arch }}.deb
+          asset_name: appname_${{ env.APP_VERSION }}_${{ matrix.deb_arch }}.deb
+          overwrite: true
+
+      - name: Upload .rpm to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ env.APP_VERSION }}"
+          file: src-tauri/target/release/bundle/rpm/appname-${{ env.APP_VERSION }}-1.${{ matrix.rpm_arch }}.rpm
+          asset_name: appname-${{ env.APP_VERSION }}-1.${{ matrix.rpm_arch }}.rpm
+          overwrite: true
+
+      - name: Upload .AppImage to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ env.APP_VERSION }}"
+          file: src-tauri/target/release/bundle/appimage/appname_${{ env.APP_VERSION }}_${{ matrix.appimage_arch }}.AppImage
+          asset_name: appname_${{ env.APP_VERSION }}_${{ matrix.appimage_arch }}.AppImage
+          overwrite: true
