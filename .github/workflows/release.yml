@@ -33,11 +33,14 @@ jobs:
         with:
           node-version: '20' # Update if your React frontend needs a different version
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build and Release App
         uses: tauri-apps/tauri-action@v0
