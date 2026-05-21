@@ -23,7 +23,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["deb", "nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -31,16 +31,10 @@
       "icons/icon.ico"
     ],
     "linux": {
-      "deb": {
-        "depends": ["webkit2gtk-4.1"]
-      }
+      "deb": {}
     },
     "windows": {
-      "nsis": {
-        "installerIcon": "icons/icon.ico",
-        "headerImage": "icons/installer-header.bmp",
-        "dialogImage": "icons/installer-dialog.bmp"
-      }
+      "nsis": {}
     }
   }
 }
