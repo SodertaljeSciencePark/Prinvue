@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Update if your React frontend needs a different version
-          cache: 'npm'       # Change to 'pnpm' or 'yarn' if applicable
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
