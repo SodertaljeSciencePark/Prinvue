@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Runs three separate machines in parallel
-        platform: [windows-latest, ubuntu-22.04, macos-latest]
+        # Runs two separate machines in parallel
+        platform: [windows-latest, ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
 
@@ -53,6 +53,6 @@ jobs:
           releaseBody: 'Automated build generated via GitHub Actions.'
           
           # Setting to true creates a "Draft" release. 
-          # It gathers the Windows, Mac, and Linux files into one release before you hit "Publish".
+          # It gathers the Windows and Linux files into one release before you hit "Publish".
           releaseDraft: true 
           prerelease: false
