@@ -34,8 +34,7 @@
       "deb": {}
     },
     "windows": {
-      "nsis": {},
-      "msi": {}
+      "nsis": {}
     }
   }
 }
