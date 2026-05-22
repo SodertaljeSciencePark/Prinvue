@@ -1,5 +1,4 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +15,7 @@ pub struct Printer {
     pub access_code: Option<String>,
     pub model_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub serial: Option<String>, 
+    pub serial: Option<String>,
     #[serde(default)]
     pub has_camera: bool,
 }
@@ -92,6 +91,55 @@ async fn get_printer_stats(server_url: String, id: String) -> Result<PrinterStat
         .map_err(|e| e.to_string())
 }
 
+// ── Export ────────────────────────────────────────────────────────────────────
+// Fetches the JSON from the Spring Boot server and returns it as a raw string.
+// The frontend turns it into a file download (no browser CORS involved).
+#[tauri::command]
+async fn export_printers(server_url: String) -> Result<String, String> {
+    let endpoint = format!("{}/api/v1/printers/export/json", trim_url(&server_url));
+    let res = reqwest::get(&endpoint)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !res.status().is_success() {
+        return Err(format!("Server returned {}", res.status()));
+    }
+
+    res.text().await.map_err(|e| e.to_string())
+}
+
+// ── Import ────────────────────────────────────────────────────────────────────
+// Accepts the raw JSON string from the frontend, wraps it in a multipart form
+// (matching @RequestParam("file") MultipartFile in Spring), and POSTs it.
+// Returns the server's response message.
+#[tauri::command]
+async fn import_printers(server_url: String, json_content: String) -> Result<String, String> {
+    let endpoint = format!("{}/api/v1/printers/import/json", trim_url(&server_url));
+
+    let part = reqwest::multipart::Part::text(json_content)
+        .file_name("import.json")
+        .mime_str("application/json")
+        .map_err(|e| e.to_string())?;
+
+    let form = reqwest::multipart::Form::new().part("file", part);
+
+    let res = Client::new()
+        .post(&endpoint)
+        .multipart(form)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let status = res.status();
+    let body = res.text().await.map_err(|e| e.to_string())?;
+
+    if status.is_success() {
+        Ok(body)
+    } else {
+        Err(body)
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -100,6 +148,8 @@ fn main() {
             update_printer,
             delete_printer,
             get_printer_stats,
+            export_printers,
+            import_printers,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
