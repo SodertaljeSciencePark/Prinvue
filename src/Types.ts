@@ -10,8 +10,10 @@ export interface Printer {
   ip: string;
   username?: string;
   accessCode?: string;
+  access_code?: string; // Fallback for backend consistency
   modelType: PrinterModel;
   hasCamera?: boolean;
+  has_camera?: boolean; // Fallback for backend consistency
   serial?: string;
 }
 

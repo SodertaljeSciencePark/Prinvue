@@ -19,9 +19,10 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
   const [name, setName] = useState(printer.name);
   const [ip, setIp] = useState(printer.ip);
   const [username, setUsername] = useState(printer.username || "");
-  const [accessCode, setAccessCode] = useState(printer.accessCode || "");
+  const [accessCode, setAccessCode] = useState(printer.accessCode || printer.access_code || "");
   const [serial, setSerial] = useState(printer.serial || ""); 
   const [modelType, setModelType] = useState<PrinterModel>(printer.modelType);
+  const [hasCamera, setHasCamera] = useState(printer.hasCamera !== false && printer.has_camera !== false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,8 +35,11 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
       ip,
       username: modelType === PrinterModel.PRUSA ? username : undefined,
       accessCode,
+      access_code: accessCode, // Send both to be safe
       modelType,
       serial: modelType.includes('BAMBU') ? serial : undefined,
+      hasCamera,
+      has_camera: hasCamera, // Send both to be safe
     };
 
     try {
@@ -79,7 +83,7 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
                 required 
               />
               <label>Access Code</label>
-              <input type="password" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
+              <input type="text" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
             </>
           )}
 
@@ -88,9 +92,18 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
               <label>Username</label>
               <input placeholder="Ex: maker" value={username} onChange={(e) => setUsername(e.target.value)} />
               <label>Password</label>
-              <input type="password" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
+              <input type="text" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
             </>
           )}
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input 
+              type="checkbox" 
+              checked={hasCamera} 
+              onChange={(e) => setHasCamera(e.target.checked)} 
+            />
+            Har kamera (Live-video)
+          </label>
 
           <div className="modal-actions">
             <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>

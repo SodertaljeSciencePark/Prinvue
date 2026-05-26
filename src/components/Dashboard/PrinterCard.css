@@ -1,64 +1,146 @@
 .printer-card {
   background-color: var(--bg-panel);
-  border: 1px solid #1f2326;
-  border-radius: 8px;
-  padding: 15px;
+  border: 1px solid var(--border-color, #1f2326);
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 335px; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .printer-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.printer-card.is-printing {
-  border-top: 4px solid var(--status-green);
-}
-
-.printer-card.is-idle {
-  border-top: 4px solid var(--accent-cyan);
-}
+.printer-card.is-printing { border-top: 3px solid var(--status-green); }
+.printer-card.is-idle { border-top: 3px solid var(--accent-cyan); }
 
 .printer-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+}
+
+.printer-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .printer-card-title {
   margin: 0;
   color: var(--text-bright);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
-.printer-card-camera {
+.model-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Video viewport sizing */
+.printer-card-camera-top {
   width: 100%;
-  height: 140px;
-  background-color: #000;
-  border-radius: 4px;
+  height: 150px;
+  background-color: #06080a;
+  border-radius: 8px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.printer-card-camera img {
+.printer-card-camera-top img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.card-camera-error-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  background-color: #090b0d;
+}
+
+.cam-icon { font-size: 1.2rem; opacity: 0.4; }
+
+.printer-card-metrics-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
 }
 
 .printer-card-stats {
   display: flex;
   justify-content: space-between;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: 8px;
 }
 
 .stat-highlight {
   color: var(--accent-cyan);
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 0.68rem;
+}
+
+.stat-value-sm {
+  color: var(--text-bright);
+  font-weight: 700;
+}
+
+.sparkline-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sparkline-item { display: flex; flex-direction: column; gap: 4px; }
+.sparkline-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.sparkline-placeholder {
+  height: 28px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
 }
 
 .printer-card-progress {
   height: 4px;
-  margin-top: 0;
+  margin-top: 2px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.04);
 }

@@ -2,127 +2,323 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 30px;
+  padding: 32px;
   overflow-y: auto;
+  background-color: var(--bg-main, #1a1d21);
 }
 
 .dashboard-header {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  color: var(--text-bright);
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  padding-bottom: 16px;
+}
+
+.header-info-block {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
+}
+
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-bright, #ffffff);
+  letter-spacing: -0.5px;
 }
 
 .status-badge {
-  margin-left: 0.5rem;
   padding: 4px 12px;
   border-radius: 20px;
-  font-weight: bold;
-  background-color: var(--bg-selection);
-  color: var(--text-main);
-  border: 1px solid #1f2326;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background-color: var(--bg-selection, rgba(255, 255, 255, 0.04));
+  color: var(--text-main, #c9cdd1);
+  border: 1px solid var(--border-color, #2a2f36);
 }
 
 .status-badge.printing {
-  color: var(--status-green);
-  border-color: var(--status-green);
+  color: var(--status-green, #73ba25);
+  border-color: rgba(115, 186, 37, 0.3);
+  background-color: rgba(115, 186, 37, 0.06);
 }
 
 .status-badge.idle {
-  color: var(--text-muted);
+  color: var(--accent-cyan, #36b9a6);
+  border-color: rgba(54, 185, 166, 0.3);
+  background-color: rgba(54, 185, 166, 0.06);
 }
 
-.dashboard-grid {
+/* ── Split Dashboard Canvas Layout Grid ─────────────────────────────────── */
+.dashboard-main-split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  gap: 24px;
+  align-items: start;
 }
 
-.camera-container img {
+.dashboard-main-split.has-stream {
+  grid-template-columns: 1.1fr 1fr; /* Equal weight balanced split layout */
+}
+
+.dashboard-main-split.no-stream {
+  grid-template-columns: 1fr;
+}
+
+/* Left side streaming box styling */
+.dashboard-stream-frame {
+  background-color: var(--bg-panel, #242830);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-stream-frame .frame-header {
+  padding: 12px 16px;
+  background-color: rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.04));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--status-red, #d15151);
+  border-radius: 50%;
+  animation: pulse-glow 1.8s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.frame-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-bright);
+}
+
+.frame-viewport {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--accent-cyan);
-  background-color: #000;
+  aspect-ratio: 16 / 9;
+  background-color: #06080a;
 }
 
-.stats-grid {
+.frame-viewport img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.camera-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted, #4a5360);
+}
+
+.placeholder-icon { font-size: 2rem; opacity: 0.4; }
+.placeholder-text { font-size: 0.82rem; font-weight: 500; }
+
+/* Right panel Analytics box flow space stacks */
+.dashboard-analytics-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-stats-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-content: start;
+  gap: 16px;
+}
+
+.progress-card {
+  grid-column: span 2;
 }
 
 .stat-card {
-  background-color: var(--bg-panel);
-  border: 1px solid #1f2326;
-  border-radius: 8px;
+  background-color: var(--bg-panel, #242830);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-label {
-  font-weight: bold;
-  color: var(--accent-cyan);
+  font-weight: 700;
+  color: var(--text-muted, #4a5360);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
+  font-size: 0.68rem;
 }
 
 .stat-value {
   font-size: 2rem;
-  color: var(--text-bright);
-  font-weight: bold;
+  color: var(--text-bright, #ffffff);
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .progress-bar-bg {
   width: 100%;
-  height: 8px;
-  background-color: #1f2326;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.04);
   border-radius: 4px;
   overflow: hidden;
-  margin-top: 5px;
+  margin-top: 6px;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background-color: var(--status-green);
-  transition: width 0.5s ease;
+  background-image: linear-gradient(90deg, var(--status-green, #73ba25), #90d143);
+  border-radius: 4px;
+  transition: width 0.4s ease;
 }
 
+/* ── Temperature History Graph Container styling ──────────────────────── */
+.temp-chart-card {
+  background-color: var(--bg-panel, #242830);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.temp-chart-empty {
+  color: var(--text-muted, #4a5360);
+  font-size: 0.82rem;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  padding-left: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.legend-dot.nozzle { background-color: var(--status-red, #d15151); }
+.legend-dot.bed { background-color: var(--status-yellow, #d3b17d); }
+
+.legend-text {
+  font-size: 0.74rem;
+  color: var(--text-muted, #4a5360);
+  font-weight: 600;
+}
+
+/* Recharts Popover tooltips styling overrides */
+.chart-tooltip {
+  background-color: #1e2227;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-time {
+  margin: 0 0 6px 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.tooltip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.tooltip-label { color: var(--text-main); }
+.tooltip-value { margin-left: auto; font-weight: 700; }
+
+/* Control Ribbon Trigger Action Buttons Styling */
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
-.btn-edit, .btn-delete {
-  padding: 8px 16px;
+.btn-edit,
+.btn-delete {
+  padding: 6px 14px;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.2s ease;
   background-color: transparent;
+  transition: all 0.15s ease;
 }
 
 .btn-edit {
-  color: var(--accent-cyan);
-  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan, #36b9a6);
+  border: 1px solid rgba(54, 185, 166, 0.3);
 }
-
 .btn-edit:hover {
-  background-color: var(--accent-cyan);
-  color: var(--bg-main);
+  background-color: rgba(54, 185, 166, 0.06);
+  border-color: var(--accent-cyan);
 }
 
 .btn-delete {
-  color: #ff5e5e;
-  border: 1px solid #ff5e5e;
+  color: var(--status-red, #d15151);
+  border: 1px solid rgba(209, 81, 81, 0.3);
+}
+.btn-delete:hover {
+  background-color: rgba(209, 81, 81, 0.06);
+  border-color: var(--status-red);
 }
 
-.btn-delete:hover {
-  background-color: #ff5e5e;
-  color: #ffffff;
+/* Adjust Responsive Wrap logic if window collapses tight */
+@media (max-width: 1100px) {
+  .dashboard-main-split.has-stream {
+    grid-template-columns: 1fr;
+  }
 }

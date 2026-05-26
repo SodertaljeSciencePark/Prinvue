@@ -8,6 +8,7 @@ import PrinterCard from "./components/Dashboard/PrinterCard";
 import EditPrinterModal from "./components/EditPrinterModal/EditPrinterModal";
 import Settings from "./components/Settings/Settings";
 import Documentation from "./components/Documentation/Documentation";
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import "./App.css";
 
 type ViewState = 'overview' | 'settings' | 'docs';
@@ -21,6 +22,7 @@ function App() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,6 @@ function App() {
   const handleExport = async () => {
     try {
       const jsonText: string = await invoke('export_printers', { serverUrl: getServerUrl() });
-
       const blob = new Blob([jsonText], { type: 'application/json' });
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -64,26 +65,19 @@ function App() {
       a.click();
       URL.revokeObjectURL(blobUrl);
       setImportStatus({ type: 'success', message: 'Export successful!' });
-      alert('Export successful!');
+      setTimeout(() => setImportStatus(null), 3000);
     } catch (err) {
       setImportStatus({ type: 'error', message: `Export failed: ${err}` });
       setTimeout(() => setImportStatus(null), 4000);
     }
   };
 
-  const handleImportClick = () => {
-    importInputRef.current?.click();
-  };
+  const handleImportClick = () => importInputRef.current?.click();
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     e.target.value = '';
-
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
       const jsonContent = await file.text();
       const message: string = await invoke('import_printers', {
@@ -95,9 +89,24 @@ function App() {
     } catch (err) {
       setImportStatus({ type: 'error', message: `Import failed: ${err}` });
     }
-
     setTimeout(() => setImportStatus(null), 4000);
   };
+
+  const toggleFullscreen = async () => {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen().catch(console.error);
+      setIsSidebarCollapsed(true);
+    } else {
+      await document.exitFullscreen().catch(console.error);
+    }
+  };
+
+  // Sync state when user presses Escape to exit fullscreen
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
 
   useEffect(() => {
     fetchPrinters();
@@ -110,13 +119,18 @@ function App() {
     if (!selectedPrinter) {
       return (
         <main className="dashboard">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+          }}>
             <h1 className="dashboard-header" style={{ margin: 0 }}>Fleet Overview</h1>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               {importStatus && (
                 <span style={{
-                  fontSize: '0.8rem',
+                  fontSize: '0.78rem',
                   padding: '4px 10px',
                   borderRadius: '4px',
                   color: importStatus.type === 'success' ? 'var(--status-green)' : 'var(--status-red)',
@@ -135,6 +149,14 @@ function App() {
               <button className="io-btn io-btn--export" onClick={handleExport} title="Export printers to JSON">
                 ↓ Export
               </button>
+              <button
+                className="io-btn"
+                onClick={toggleFullscreen}
+                title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                style={{ padding: '7px 10px' }}
+              >
+                {isFullscreen ? <FiMinimize2 size={14} /> : <FiMaximize2 size={14} />}
+              </button>
 
               <input
                 ref={importInputRef}
@@ -146,7 +168,11 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+            gap: '18px',
+          }}>
             {printers.map(p => (
               <PrinterCard
                 key={p.id}
@@ -155,7 +181,15 @@ function App() {
               />
             ))}
             {printers.length === 0 && (
-              <div style={{ color: 'var(--text-muted)' }}>Inga skrivare tillagda än. Klicka på + i menyn.</div>
+              <div style={{
+                color: 'var(--text-muted)',
+                gridColumn: '1 / -1',
+                textAlign: 'center',
+                padding: '80px 0',
+                fontSize: '0.95rem',
+              }}>
+                No printers added yet — click <strong style={{ color: 'var(--accent-cyan)' }}>+</strong> in the sidebar.
+              </div>
             )}
           </div>
         </main>

@@ -1,53 +1,126 @@
+/* ── CSS Variables ──────────────────────────────────────────────────────────── */
 :root {
-  --bg-main: #22272b;
-  --bg-panel: #2d3238;
+  --bg-main: #1a1d21;
+  --bg-panel: #242830;
+  --bg-sidebar: #1e2227;
   --bg-selection: #2c474a;
 
-  --text-main: #d1d5d4;
+  --text-main: #c9cdd1;
   --text-bright: #ffffff;
-  --text-muted: #5b656e;
+  --text-muted: #4a5360;
 
   --accent-cyan: #36b9a6;
   --status-green: #73ba25;
   --status-yellow: #d3b17d;
   --status-red: #d15151;
+
+  --border-color: #2a2f36;
+  --chart-grid: rgba(255, 255, 255, 0.055);
 }
 
+/* ── Dark (Default) ─────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg-main: #22272b;
-  --bg-panel: #2d3238;
-  --bg-sidebar: #2d3238;
+  --bg-main: #1a1d21;
+  --bg-panel: #242830;
+  --bg-sidebar: #1e2227;
   --bg-selection: #2c474a;
-  --text-main: #d1d5d4;
+  --text-main: #c9cdd1;
   --text-bright: #ffffff;
-  --text-muted: #5b656e;
+  --text-muted: #4a5360;
   --accent-cyan: #36b9a6;
+  --status-green: #73ba25;
+  --status-yellow: #d3b17d;
+  --status-red: #d15151;
+  --border-color: #2a2f36;
+  --chart-grid: rgba(255, 255, 255, 0.055);
 }
 
+/* ── Light ──────────────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-main: #f5f5f5;
-  --bg-sidebar: #e0e0e0;
-  --text-main: #111111;
-  --text-muted: #555555;
-  --accent-cyan: #007acc;
+  --bg-main: #eef0f4;
+  --bg-panel: #ffffff;
+  --bg-sidebar: #e0e4ea;
+  --bg-selection: #dbeafe;
+  --text-main: #1a202c;
+  --text-bright: #0a0e14;
+  --text-muted: #7a8696;
+  --accent-cyan: #0891b2;
+  --status-green: #16a34a;
+  --status-yellow: #b45309;
+  --status-red: #dc2626;
+  --border-color: #d8dde6;
+  --chart-grid: rgba(0, 0, 0, 0.07);
 }
 
+/* ── Ocean ──────────────────────────────────────────────────────────────────── */
 [data-theme="ocean"] {
-  --bg-main: #0f172a;
-  --bg-sidebar: #1e293b;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --accent-cyan: #38bdf8;
+  --bg-main: #07111e;
+  --bg-panel: #0d1b2e;
+  --bg-sidebar: #091522;
+  --bg-selection: #142d4a;
+  --text-main: #8ec8e8;
+  --text-bright: #d8eefb;
+  --text-muted: #3a6480;
+  --accent-cyan: #00c4e0;
+  --status-green: #06d6a0;
+  --status-yellow: #ffd166;
+  --status-red: #ef476f;
+  --border-color: #0f2338;
+  --chart-grid: rgba(255, 255, 255, 0.05);
 }
 
+/* ── Dracula ────────────────────────────────────────────────────────────────── */
 [data-theme="dracula"] {
-  --bg-main: #282a36;
-  --bg-sidebar: #44475a;
+  --bg-main: #191a24;
+  --bg-panel: #282a36;
+  --bg-sidebar: #1a1b26;
+  --bg-selection: #44475a;
   --text-main: #f8f8f2;
+  --text-bright: #f8f8f2;
   --text-muted: #6272a4;
   --accent-cyan: #ff79c6;
+  --status-green: #50fa7b;
+  --status-yellow: #f1fa8c;
+  --status-red: #ff5555;
+  --border-color: #363848;
+  --chart-grid: rgba(255, 255, 255, 0.06);
 }
 
+/* ── Nord ───────────────────────────────────────────────────────────────────── */
+[data-theme="nord"] {
+  --bg-main: #242933;
+  --bg-panel: #2e3440;
+  --bg-sidebar: #1e2330;
+  --bg-selection: #3b4252;
+  --text-main: #d8dee9;
+  --text-bright: #eceff4;
+  --text-muted: #5a6678;
+  --accent-cyan: #88c0d0;
+  --status-green: #a3be8c;
+  --status-yellow: #ebcb8b;
+  --status-red: #bf616a;
+  --border-color: #353d4e;
+  --chart-grid: rgba(255, 255, 255, 0.055);
+}
+
+/* ── Catppuccin Mocha ───────────────────────────────────────────────────────── */
+[data-theme="mocha"] {
+  --bg-main: #1e1e2e;
+  --bg-panel: #313244;
+  --bg-sidebar: #181825;
+  --bg-selection: #45475a;
+  --text-main: #cdd6f4;
+  --text-bright: #cdd6f4;
+  --text-muted: #585b70;
+  --accent-cyan: #89dceb;
+  --status-green: #a6e3a1;
+  --status-yellow: #f9e2af;
+  --status-red: #f38ba8;
+  --border-color: #45475a;
+  --chart-grid: rgba(255, 255, 255, 0.055);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
 }
@@ -68,8 +141,11 @@ body {
   width: 100vw;
 }
 
-/* ── Export / Import buttons ──────────────────────────────────────────────── */
+/* ── IO Buttons (Import / Export / Fullscreen) ──────────────────────────────── */
 .io-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 7px 14px;
   border-radius: 5px;
   font-size: 0.82rem;
@@ -77,23 +153,21 @@ body {
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.18s ease;
-
-  /* Default: Import style */
   background-color: transparent;
   color: var(--text-muted);
   border: 1px solid var(--text-muted);
+  line-height: 1;
 }
 
 .io-btn:hover {
   color: var(--text-bright);
   border-color: var(--text-bright);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(128, 128, 128, 0.08);
 }
 
 .io-btn--export {
   color: var(--accent-cyan);
   border-color: var(--accent-cyan);
-  background-color: transparent;
 }
 
 .io-btn--export:hover {
