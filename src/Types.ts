@@ -10,16 +10,26 @@ export interface Printer {
   ip: string;
   username?: string;
   accessCode?: string;
-  access_code?: string; // Fallback for backend consistency
+  access_code?: string;
   modelType: PrinterModel;
   hasCamera?: boolean;
-  has_camera?: boolean; // Fallback for backend consistency
+  has_camera?: boolean;
   serial?: string;
 }
 
 export interface PrinterStats {
   currentStatus: string;
   progressPercent: number;
+  nozzleTemp: number;
+  bedTemp: number;
+}
+
+export interface PrinterLog {
+  id: string;
+  printerId: string;
+  eventType: string;
+  message: string;
+  timestamp: string;
   nozzleTemp: number;
   bedTemp: number;
 }

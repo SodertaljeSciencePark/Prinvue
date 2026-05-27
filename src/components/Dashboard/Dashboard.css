@@ -54,7 +54,6 @@
   background-color: rgba(54, 185, 166, 0.06);
 }
 
-/* ── Split Dashboard Canvas Layout Grid ─────────────────────────────────── */
 .dashboard-main-split {
   display: grid;
   gap: 24px;
@@ -62,14 +61,13 @@
 }
 
 .dashboard-main-split.has-stream {
-  grid-template-columns: 1.1fr 1fr; /* Equal weight balanced split layout */
+  grid-template-columns: 1.1fr 1fr;
 }
 
 .dashboard-main-split.no-stream {
   grid-template-columns: 1fr;
 }
 
-/* Left side streaming box styling */
 .dashboard-stream-frame {
   background-color: var(--bg-panel, #242830);
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
@@ -136,7 +134,6 @@
 .placeholder-icon { font-size: 2rem; opacity: 0.4; }
 .placeholder-text { font-size: 0.82rem; font-weight: 500; }
 
-/* Right panel Analytics box flow space stacks */
 .dashboard-analytics-frame {
   display: flex;
   flex-direction: column;
@@ -196,7 +193,6 @@
   transition: width 0.4s ease;
 }
 
-/* ── Temperature History Graph Container styling ──────────────────────── */
 .temp-chart-card {
   background-color: var(--bg-panel, #242830);
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
@@ -247,7 +243,6 @@
   font-weight: 600;
 }
 
-/* Recharts Popover tooltips styling overrides */
 .chart-tooltip {
   background-color: #1e2227;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -281,7 +276,6 @@
 .tooltip-label { color: var(--text-main); }
 .tooltip-value { margin-left: auto; font-weight: 700; }
 
-/* Control Ribbon Trigger Action Buttons Styling */
 .action-buttons {
   display: flex;
   gap: 10px;
@@ -316,9 +310,37 @@
   border-color: var(--status-red);
 }
 
-/* Adjust Responsive Wrap logic if window collapses tight */
 @media (max-width: 1100px) {
   .dashboard-main-split.has-stream {
     grid-template-columns: 1fr;
   }
+}
+
+.dashboard-analytics-section {
+  margin-top: 32px;
+}
+
+.dashboard-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.dashboard-section-divider::before,
+.dashboard-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.section-divider-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding: 0 4px;
 }

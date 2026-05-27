@@ -59,17 +59,25 @@ export default function PrinterCard({ printer, onClick }: Props) {
   useEffect(() => {
     setCameraError(false);
     
+    let tickCount = 0;
+
     const fetchStats = async () => {
       try {
         const data: PrinterStats = await invoke('get_printer_stats', {
           serverUrl: getServerUrl(),
           id: printer.id,
         });
+
         setStats(data);
-        setNozzleHistory(h => [...h.slice(-(MAX_HISTORY - 1)), data.nozzleTemp ?? 0]);
-        setBedHistory(h => [...h.slice(-(MAX_HISTORY - 1)), data.bedTemp ?? 0]);
+
+        if (tickCount % 10 === 0) {
+          setNozzleHistory(h => [...h.slice(-(MAX_HISTORY - 1)), data.nozzleTemp ?? 0]);
+          setBedHistory(h => [...h.slice(-(MAX_HISTORY - 1)), data.bedTemp ?? 0]);
+        }
+
+        tickCount++;
       } catch (_) {
-        // Fail silently if server is momentarily unreachable
+        setStats(prev => prev ? { ...prev, currentStatus: 'ERROR' } : null);
       }
     };
 
@@ -90,7 +98,6 @@ export default function PrinterCard({ printer, onClick }: Props) {
       className={`printer-card ${isPrinting ? 'is-printing' : 'is-idle'}`}
       onClick={onClick}
     >
-      {/* Header Row */}
       <div className="printer-card-header">
         <div className="printer-card-title-row">
           <h3 className="printer-card-title">{printer.name}</h3>
@@ -101,7 +108,6 @@ export default function PrinterCard({ printer, onClick }: Props) {
         </span>
       </div>
 
-      {/* Top Half: Live Video Stream Frame */}
       {showCamera && (
         <div className="printer-card-camera-top">
           {cameraError ? (
@@ -128,7 +134,6 @@ export default function PrinterCard({ printer, onClick }: Props) {
         </div>
       )}
 
-      {/* Bottom Half: Telemetry Values & Sparklines */}
       <div className="printer-card-metrics-bottom">
         <div className="printer-card-stats">
           <div>
@@ -157,7 +162,6 @@ export default function PrinterCard({ printer, onClick }: Props) {
         </div>
       </div>
 
-      {/* Progress Footer Bar */}
       <div className="progress-bar-bg printer-card-progress">
         <div
           className="progress-bar-fill"

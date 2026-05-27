@@ -35,11 +35,11 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
       ip,
       username: modelType === PrinterModel.PRUSA ? username : undefined,
       accessCode,
-      access_code: accessCode, // Send both to be safe
+      access_code: accessCode,
       modelType,
       serial: modelType.includes('BAMBU') ? serial : undefined,
       hasCamera,
-      has_camera: hasCamera, // Send both to be safe
+      has_camera: hasCamera,
     };
 
     try {
@@ -47,8 +47,8 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
       onUpdated(updatedPrinter);
       onClose();
     } catch (error) {
-      console.error("Kunde inte uppdatera skrivare:", error);
-      alert("Något gick fel när skrivaren skulle uppdateras.");
+      console.error("Could not update printer:", error);
+      alert("Something went wrong while updating the printer.");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,29 +57,29 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Redigera Skrivare</h2>
+        <h2>Edit Printer</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <label>Modell</label>
+          <label>Model</label>
           <select value={modelType} onChange={(e) => setModelType(e.target.value as PrinterModel)}>
             <option value={PrinterModel.BAMBU_X_SERIES}>Bambu Lab X-Series</option>
             <option value={PrinterModel.BAMBU_P_SERIES}>Bambu Lab P-Series</option>
             <option value={PrinterModel.PRUSA}>Prusa</option>
           </select>
 
-          <label>Namn</label>
+          <label>Name</label>
           <input required value={name} onChange={(e) => setName(e.target.value)} />
 
-          <label>IP-adress</label>
+          <label>IP Address</label>
           <input required value={ip} onChange={(e) => setIp(e.target.value)} />
 
           {modelType.includes('BAMBU') && (
             <>
-              <label>Serienummer (Serial)</label>
+              <label>Serial Number</label>
               <input 
                 type="text" 
                 value={serial} 
                 onChange={(e) => setSerial(e.target.value)} 
-                placeholder="T.ex. 01P00A..." 
+                placeholder="e.g. 01P00A..." 
                 required 
               />
               <label>Access Code</label>
@@ -102,15 +102,15 @@ export default function EditPrinterModal({ printer, onClose, onUpdated }: Props)
               checked={hasCamera} 
               onChange={(e) => setHasCamera(e.target.checked)} 
             />
-            Har kamera (Live-video)
+            Has camera (Live video)
           </label>
 
           <div className="modal-actions">
             <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>
-              Avbryt
+              Cancel
             </button>
             <button type="submit" className="save-btn" disabled={isSubmitting}>
-              {isSubmitting ? "Sparar..." : "Spara ändringar"}
+              {isSubmitting ? "Saving..." : "Save changes"}
             </button>
           </div>
         </form>

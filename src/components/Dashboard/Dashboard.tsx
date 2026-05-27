@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Printer, PrinterStats } from '../../Types';
+import SystemLogs from '../SystemLogs/SystemLogs';
 import './Dashboard.css';
 
 const MAX_HISTORY = 720;
@@ -47,7 +48,7 @@ function TempChart({ data }: TempChartProps) {
           <XAxis 
             dataKey="time" 
             tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
-            interval={119} // Shows a tick roughly every 120 points (1 hour)
+            interval={119}
             axisLine={false}
             tickLine={false}
           />
@@ -115,26 +116,33 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
     setHistory([]);
     setCameraError(false);
 
+    let tickCount = 0;
+
     const fetchStats = async () => {
       try {
         const data: PrinterStats = await invoke('get_printer_stats', {
           serverUrl: getServerUrl(),
           id: printer.id,
         });
-        console.log(`Fetched stats for ${printer.name}:`, data);
+        
         setStats(data);
         
-        const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        setHistory(h => [
-          ...h.slice(-(MAX_HISTORY - 1)),
-          {
-            time: timeString,
-            nozzle: data.nozzleTemp ?? 0,
-            bed: data.bedTemp ?? 0
-          }
-        ]);
+        if (tickCount % 15 === 0) {
+          const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          setHistory(h => [
+            ...h.slice(-(MAX_HISTORY - 1)),
+            {
+              time: timeString,
+              nozzle: data.nozzleTemp ?? 0,
+              bed: data.bedTemp ?? 0
+            }
+          ]);
+        }
+        
+        tickCount++;
       } catch (e) {
         console.error(`Failed fetching telemetry for ${printer.name}:`, e);
+        setStats(prev => prev ? { ...prev, currentStatus: 'CONNECTION ERROR' } : null);
       }
     };
 
@@ -153,7 +161,6 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
 
   return (
     <main className="dashboard">
-      {/* Dashboard Top Header Control Ribbon */}
       <div className="dashboard-header">
         <div className="header-info-block">
           <h1 className="dashboard-title">{printer.name}</h1>
@@ -169,10 +176,8 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
         </div>
       </div>
 
-      {/* Synchronized Twin-Panel Split View layout Workspace */}
       <div className={`dashboard-main-split ${showCamera ? 'has-stream' : 'no-stream'}`}>
         
-        {/* Stream Wing */}
         {showCamera && (
           <div className="dashboard-stream-frame">
             <div className="frame-header">
@@ -202,7 +207,6 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
           </div>
         )}
 
-        {/* Analytics Insights Data Stack Wing */}
         <div className="dashboard-analytics-frame">
           <div className="dashboard-stats-row">
             <div className="stat-card progress-card">
@@ -227,7 +231,6 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
             </div>
           </div>
 
-          {/* Historical Recharts Graph inside same right-hand space block */}
           <div className="temp-chart-card">
             <span className="stat-label">Historical Analytics (Timeline)</span>
             <TempChart data={history} />
@@ -235,6 +238,14 @@ export default function Dashboard({ printer, onEdit, onDelete }: Props) {
         </div>
 
       </div>
+
+      <div className="dashboard-analytics-section">
+        <div className="dashboard-section-divider">
+          <span className="section-divider-label">System Telemetry Logs</span>
+        </div>
+        <SystemLogs printer={printer} embedded />
+      </div>
+
     </main>
   );
 }

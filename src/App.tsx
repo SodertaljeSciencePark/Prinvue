@@ -11,7 +11,7 @@ import Documentation from "./components/Documentation/Documentation";
 import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import "./App.css";
 
-type ViewState = 'overview' | 'settings' | 'docs';
+type ViewState = 'overview' | 'settings' | 'docs' | 'logs';
 
 function App() {
   const [printers, setPrinters] = useState<Printer[]>([]);
@@ -39,7 +39,7 @@ function App() {
       const data: Printer[] = await invoke("fetch_printers", { serverUrl: url });
       setPrinters(data);
     } catch (error) {
-      console.error("Fel vid hämtning av skrivare:", error);
+      console.error("Error fetching printers:", error);
     }
   };
 
@@ -50,7 +50,7 @@ function App() {
       fetchPrinters();
       setSelectedPrinter(null);
     } catch (error) {
-      console.error("Kunde inte radera skrivare:", error);
+      console.error("Could not delete printer:", error);
     }
   };
 
@@ -101,7 +101,6 @@ function App() {
     }
   };
 
-  // Sync state when user presses Escape to exit fullscreen
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handler);
