@@ -59,7 +59,7 @@ The Settings tab controls how the application interacts with your server.
 
 ### Danger Zone
 - **Clear All Database Logs**: A global cleanup button that wipes all telemetry history for all printers. Useful for saving disk space.
-- **Restart Docker Services**: Communicates with the host system to run `docker compose restart`. This is useful if the backend becomes unresponsive or if you've made configuration changes.
+- **Restart Docker Services (This service does not work yet but comming soon)** : Communicates with the host system to run `docker compose restart`. This is useful if the backend becomes unresponsive or if you've made configuration changes. For now you have to manualy restart the docker container by running `docker compose restart` in the same folder as the compose file.
 
 ## 5. Adding & Editing Printers
 

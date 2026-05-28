@@ -28,9 +28,10 @@ If you encounter issues while using Prinvue, follow these steps to diagnose and 
   ```
   After saving, recreate the container to apply the changes.
 
-If you find a persistent bug that isn't covered here, please report it via the project repository on github. 
+If you find a persistent bug that isn't covered here, please report it via the project repository on github or mail. 
 [Desktop app Github](https://github.com/SodertaljeSciencePark/Prinvue).
 [Server app Github](https://github.com/SodertaljeSciencePark/printerkurwa).
+victor.hernandez@bytebase.se
  Include as much detail as possible, such as:
 - Printer model.
 - What you were doing when the error occurred.
