@@ -20,9 +20,8 @@ export default function AddPrinterModal({ onClose, onAdded }: Props) {
   const [ip, setIp] = useState('');
   const [username, setUsername] = useState('');
   const [accessCode, setAccessCode] = useState('');
-  // --- LÄGG TILL DETTA: State för serienummer ---
   const [serial, setSerial] = useState(''); 
-  const [hasCamera, setHasCamera] = useState(true);
+  const [hasCamera, setHasCamera] = useState(model.includes('BAMBU'));
   const [error, setError] = useState('');
 
   const handleSave = async () => {
@@ -32,10 +31,11 @@ export default function AddPrinterModal({ onClose, onAdded }: Props) {
         ip,
         modelType: model,
         username: model === PrinterModel.PRUSA ? username : undefined,
-        accessCode: model.includes('BAMBU') || model === PrinterModel.PRUSA ? accessCode : undefined,
-        // --- LÄGG TILL DETTA: Skicka med serienumret om det är en Bambu-skrivare ---
+        accessCode: (model.includes('BAMBU') || model === PrinterModel.PRUSA) ? accessCode : undefined,
+        access_code: (model.includes('BAMBU') || model === PrinterModel.PRUSA) ? accessCode : undefined,
         serial: model.includes('BAMBU') ? serial : undefined, 
-        hasCamera: model === PrinterModel.PRUSA ? hasCamera : true,
+        hasCamera: model.includes('BAMBU') ? true : hasCamera,
+        has_camera: model.includes('BAMBU') ? true : hasCamera,
       };
 
       await invoke('add_printer', { serverUrl: getServerUrl(), printer: newPrinter });
@@ -49,40 +49,40 @@ export default function AddPrinterModal({ onClose, onAdded }: Props) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Lägg till skrivare</h2>
+        <h2>Add Printer</h2>
 
         {error && <div className="error-box">{error}</div>}
 
-        <label>Modell</label>
+        <label>Model</label>
         <select
           className="model-select"
           value={model}
           onChange={(e) => setModel(e.target.value as PrinterModel)}
         >
-          <option value={PrinterModel.BAMBU_X_SERIES}>Bambu Lab X-Serie</option>
-          <option value={PrinterModel.BAMBU_P_SERIES}>Bambu Lab P-Serie</option>
+          <option value={PrinterModel.BAMBU_X_SERIES}>Bambu Lab X-Series</option>
+          <option value={PrinterModel.BAMBU_P_SERIES}>Bambu Lab P-Series</option>
           <option value={PrinterModel.PRUSA}>Prusa (Link)</option>
         </select>
 
-        <label>Namn</label>
-        <input placeholder="T.ex. Min X1C" value={name} onChange={(e) => setName(e.target.value)} />
+        <label>Name</label>
+        <input placeholder="e.g. My X1C" value={name} onChange={(e) => setName(e.target.value)} />
 
-        <label>IP-adress</label>
+        <label>IP Address</label>
         <input placeholder="192.168.1.x" value={ip} onChange={(e) => setIp(e.target.value)} />
 
         {model.includes('BAMBU') && (
           <>
-            <label>Serienummer (Serial)</label>
+            <label>Serial Number</label>
             <input 
               type="text" 
               value={serial} 
               onChange={(e) => setSerial(e.target.value)} 
-              placeholder="T.ex. 01P00A..." 
+              placeholder="e.g. 01P00A..." 
               required 
             />
             <label>Access Code</label>
             <input
-              type="password"
+              type="text"
               placeholder="Ex: b67d3043"
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
@@ -105,21 +105,22 @@ export default function AddPrinterModal({ onClose, onAdded }: Props) {
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
             />
-            <label>
-              <input
-                type="checkbox"
-                checked={hasCamera}
-                onChange={(e) => setHasCamera(e.target.checked)}
-                style={{ marginRight: '8px' }}
-              />
-              Har kamera
-            </label>
           </>
         )}
 
+        <label style={{ display: 'flex', alignItems: 'center', marginTop: '10px', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={hasCamera}
+            onChange={(e) => setHasCamera(e.target.checked)}
+            style={{ marginRight: '8px' }}
+          />
+          Has camera (Live video)
+        </label>
+
         <div className="modal-actions">
-          <button className="cancel-btn" onClick={onClose}>Avbryt</button>
-          <button className="save-btn" onClick={handleSave}>Spara</button>
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="save-btn" onClick={handleSave}>Save</button>
         </div>
       </div>
     </div>

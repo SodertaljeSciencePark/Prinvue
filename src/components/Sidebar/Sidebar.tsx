@@ -7,10 +7,10 @@ import { FiChevronLeft, FiChevronRight, FiGrid, FiPrinter, FiPlus } from "react-
 interface Props {
   printers: Printer[];
   selectedPrinter: Printer | null;
-  onSelectPrinter: (printer: Printer) => void;
+  onSelectPrinter: (printer: Printer | null) => void;
   onOpenAddModal: () => void;
   currentView: string;
-  onChangeView: (view: 'overview' | 'settings' | 'docs') => void;
+  onChangeView: (view: 'overview' | 'settings' | 'docs' | 'logs') => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
@@ -20,7 +20,7 @@ export default function Sidebar({ printers, selectedPrinter, onSelectPrinter, on
     <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-title">{isCollapsed ? 'P' : 'PRINVUE'}</div>
-        <button className="collapse-btn" onClick={onToggleCollapse} title={isCollapsed ? "Expandera meny" : "Minimera meny"}>
+        <button className="collapse-btn" onClick={onToggleCollapse} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
           {isCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
         </button>
       </div>
@@ -29,13 +29,13 @@ export default function Sidebar({ printers, selectedPrinter, onSelectPrinter, on
         <button
           className={`view-all-btn ${(!selectedPrinter && currentView === 'overview') ? 'active' : ''}`}
           onClick={() => {
-            onSelectPrinter(null as any);
+            onSelectPrinter(null);
             onChangeView('overview');
           }}
-          title="Översikt"
+          title="Overview"
         >
           <FiGrid size={22} className="btn-icon" /> 
-          {!isCollapsed && <span>Översikt</span>}
+          {!isCollapsed && <span>Overview</span>}
         </button>
       </div>
 
@@ -64,9 +64,9 @@ export default function Sidebar({ printers, selectedPrinter, onSelectPrinter, on
       </ul>
 
       <div className="sidebar-footer">
-        <button className="add-printer-btn" onClick={onOpenAddModal} title="Lägg till skrivare">
+        <button className="add-printer-btn" onClick={onOpenAddModal} title="Add Printer">
           <FiPlus size={24} className="btn-icon" /> 
-          {!isCollapsed && <span>Lägg till skrivare</span>}
+          {!isCollapsed && <span>Add Printer</span>}
         </button>
       </div>
       
@@ -74,14 +74,14 @@ export default function Sidebar({ printers, selectedPrinter, onSelectPrinter, on
         <button 
           onClick={() => onChangeView('settings')}
           className={`bottom-icon-btn ${currentView === 'settings' ? 'active' : ''}`}
-          title="Inställningar"
+          title="Settings"
         >
           <IoIosSettings size={28} />
         </button>
         <button 
           onClick={() => onChangeView('docs')}
           className={`bottom-icon-btn ${currentView === 'docs' ? 'active' : ''}`}
-          title="Dokumentation"
+          title="Documentation"
         >
           <IoDocumentText size={26} />
         </button>

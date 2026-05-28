@@ -24,16 +24,16 @@ const docsList: DocPage[] = Object.keys(docModules).map((path) => {
 
 export default function Documentation() {
     const [activeDoc, setActiveDoc] = useState<DocPage | null>(docsList[0] || null);
-    const [content, setContent] = useState("Laddar...");
+    const [content, setContent] = useState("Loading...");
 
     useEffect(() => {
         if (activeDoc) {
-            setContent("Laddar dokument...");
+            setContent("Loading document...");
             activeDoc.load()
                 .then((text) => setContent(text))
-                .catch(() => setContent("# Fel\nKunde inte ladda innehållet."));
+                .catch(() => setContent("# Error\nCould not load content."));
         } else {
-            setContent("# Inga dokument hittades\nLägg till `.md`-filer i mappen `public/docs/`.");
+            setContent("# No documents found\nAdd `.md` files to the `public/docs/` folder.");
         }
     }, [activeDoc]);
 
@@ -52,7 +52,7 @@ export default function Documentation() {
                         </li>
                     ))}
                     {docsList.length === 0 && (
-                        <li style={{ color: 'var(--text-muted)' }}>Inga filer...</li>
+                        <li style={{ color: 'var(--text-muted)' }}>No files...</li>
                     )}
                 </ul>
             </aside>

@@ -91,9 +91,6 @@ async fn get_printer_stats(server_url: String, id: String) -> Result<PrinterStat
         .map_err(|e| e.to_string())
 }
 
-// ── Export ────────────────────────────────────────────────────────────────────
-// Fetches the JSON from the Spring Boot server and returns it as a raw string.
-// The frontend turns it into a file download (no browser CORS involved).
 #[tauri::command]
 async fn export_printers(server_url: String) -> Result<String, String> {
     let endpoint = format!("{}/api/v1/printers/export/json", trim_url(&server_url));
@@ -108,10 +105,6 @@ async fn export_printers(server_url: String) -> Result<String, String> {
     res.text().await.map_err(|e| e.to_string())
 }
 
-// ── Import ────────────────────────────────────────────────────────────────────
-// Accepts the raw JSON string from the frontend, wraps it in a multipart form
-// (matching @RequestParam("file") MultipartFile in Spring), and POSTs it.
-// Returns the server's response message.
 #[tauri::command]
 async fn import_printers(server_url: String, json_content: String) -> Result<String, String> {
     let endpoint = format!("{}/api/v1/printers/import/json", trim_url(&server_url));
@@ -140,6 +133,54 @@ async fn import_printers(server_url: String, json_content: String) -> Result<Str
     }
 }
 
+#[tauri::command]
+async fn fetch_printer_logs(server_url: String, printer_id: String) -> Result<String, String> {
+    let endpoint = format!("{}/api/v1/logs/{}", trim_url(&server_url), printer_id);
+    let res = reqwest::get(&endpoint)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !res.status().is_success() {
+        return Err(format!("Server returned {}", res.status()));
+    }
+
+    res.text().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn clear_printer_logs(server_url: String, printer_id: String) -> Result<(), String> {
+    let endpoint = format!("{}/api/v1/logs/{}", trim_url(&server_url), printer_id);
+    Client::new()
+        .delete(&endpoint)
+        .send()
+        .await
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn clear_all_logs(server_url: String) -> Result<(), String> {
+    let endpoint = format!("{}/api/v1/logs/all", trim_url(&server_url));
+    Client::new()
+        .delete(&endpoint)
+        .send()
+        .await
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn restart_docker_services(server_url: String) -> Result<String, String> {
+    let endpoint = format!("{}/api/v1/system/restart", trim_url(&server_url));
+    Client::new()
+        .post(&endpoint)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok("Services restart sequence initiated".to_string())
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -150,6 +191,10 @@ fn main() {
             get_printer_stats,
             export_printers,
             import_printers,
+            fetch_printer_logs,
+            clear_printer_logs,
+            clear_all_logs,
+            restart_docker_services,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
